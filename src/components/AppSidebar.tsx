@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { categories, type IntegrationCategory } from "@/data/integrations";
-import { LayoutDashboard, Settings, Workflow } from "lucide-react";
+import { LayoutDashboard, Settings, Workflow, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 const navItems: { to: string; label: string; icon: React.ReactNode }[] = [
   { to: "/", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
