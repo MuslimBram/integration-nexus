@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { categories, type IntegrationCategory } from "@/data/integrations";
-import { LayoutDashboard, Settings, Workflow } from "lucide-react";
+import { LayoutDashboard, Settings, Workflow, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 const navItems: { to: string; label: string; icon: React.ReactNode }[] = [
   { to: "/", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -9,6 +11,7 @@ const navItems: { to: string; label: string; icon: React.ReactNode }[] = [
 
 export default function AppSidebar() {
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <aside className="w-64 min-h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
@@ -55,7 +58,10 @@ export default function AppSidebar() {
         )}
       </nav>
 
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border space-y-1">
+        {user && (
+          <p className="text-[10px] text-sidebar-foreground/50 px-3 truncate">{user.email}</p>
+        )}
         <Link
           to="/settings"
           className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/50 transition-colors"
@@ -63,6 +69,15 @@ export default function AppSidebar() {
           <Settings className="w-4 h-4" />
           Settings
         </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-3 px-3 text-sidebar-foreground/70 hover:bg-sidebar-accent/50"
+          onClick={signOut}
+        >
+          <LogOut className="w-4 h-4" />
+          Dil
+        </Button>
       </div>
     </aside>
   );

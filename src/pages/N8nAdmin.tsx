@@ -4,52 +4,68 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Workflow, Play, RefreshCw, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Workflow, Play, RefreshCw, CheckCircle, XCircle, Clock, Save } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useN8nConfig,
+  useN8nWorkflows,
+  useSaveN8nConfig,
+  useTestN8nConnection,
+  useSyncN8nWorkflows,
+  useToggleN8nWorkflow,
+  useTriggerN8nWorkflow,
+  useUpdateWorkflowMapping,
+} from "@/hooks/use-n8n";
 
-interface N8nWorkflow {
-  id: string;
-  name: string;
-  active: boolean;
-  lastRun: string | null;
-  status: "success" | "error" | "idle";
-  eventType: string;
-}
-
-const mockWorkflows: N8nWorkflow[] = [
-  { id: "1", name: "New Lead Handler", active: true, lastRun: "2 min ago", status: "success", eventType: "new_lead" },
-  { id: "2", name: "Missed Call Follow-up", active: true, lastRun: "1 hr ago", status: "success", eventType: "missed_call" },
-  { id: "3", name: "Payment Confirmation", active: false, lastRun: null, status: "idle", eventType: "payment_success" },
-  { id: "4", name: "Abandoned Cart Recovery", active: true, lastRun: "30 min ago", status: "error", eventType: "abandoned_cart" },
-  { id: "5", name: "AI Analysis Job", active: true, lastRun: "5 min ago", status: "success", eventType: "ai_analysis" },
-  { id: "6", name: "Competitor Scan", active: false, lastRun: "1 day ago", status: "success", eventType: "competitor_scan" },
-  { id: "7", name: "Content Generation", active: true, lastRun: "15 min ago", status: "success", eventType: "content_generation" },
-  { id: "8", name: "Booking Request Handler", active: true, lastRun: "45 min ago", status: "success", eventType: "booking_request" },
-  { id: "9", name: "Form Submit Processor", active: true, lastRun: "10 min ago", status: "success", eventType: "form_submit" },
-  { id: "10", name: "Follow-up Reminder", active: false, lastRun: "2 hrs ago", status: "idle", eventType: "follow_up" },
+const EVENT_TYPES = [
+  "new_lead", "new_message", "missed_call", "form_submit",
+  "payment_success", "abandoned_cart", "booking_request",
+  "follow_up", "ai_analysis", "competitor_scan", "content_generation",
 ];
 
-const statusIcons = {
+const statusIcons: Record<string, JSX.Element> = {
   success: <CheckCircle className="w-4 h-4 text-success" />,
+  active: <CheckCircle className="w-4 h-4 text-success" />,
   error: <XCircle className="w-4 h-4 text-destructive" />,
   idle: <Clock className="w-4 h-4 text-muted-foreground" />,
 };
 
 export default function N8nAdmin() {
+  const { data: config, isLoading: configLoading } = useN8nConfig();
+  const { data: workflows, isLoading: wfLoading } = useN8nWorkflows();
+
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
-  const [isConnected, setIsConnected] = useState(false);
-  const [workflows, setWorkflows] = useState<N8nWorkflow[]>(mockWorkflows);
+  const [initialized, setInitialized] = useState(false);
 
-  const handleTestConnection = () => {
-    if (baseUrl && apiKey) setIsConnected(true);
+  // Initialize form from config
+  if (config && !initialized) {
+    setBaseUrl(config.base_url || "");
+    setWebhookSecret(config.webhook_secret || "");
+    setInitialized(true);
+  }
+
+  const saveConfig = useSaveN8nConfig();
+  const testConnection = useTestN8nConnection();
+  const syncWorkflows = useSyncN8nWorkflows();
+  const toggleWorkflow = useToggleN8nWorkflow();
+  const triggerWorkflow = useTriggerN8nWorkflow();
+  const updateMapping = useUpdateWorkflowMapping();
+
+  const handleSaveConfig = () => {
+    saveConfig.mutate({ base_url: baseUrl, api_key: apiKey, webhook_secret: webhookSecret });
   };
 
-  const toggleWorkflow = (id: string) => {
-    setWorkflows((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, active: !w.active } : w))
+  if (configLoading) {
+    return (
+      <div className="space-y-6 max-w-6xl">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-48 rounded-lg" />
+      </div>
     );
-  };
+  }
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -68,8 +84,9 @@ export default function N8nAdmin() {
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
             Connection Settings
-            <Badge variant={isConnected ? "default" : "secondary"} className={isConnected ? "bg-success text-success-foreground" : ""}>
-              {isConnected ? "Connected" : "Not Connected"}
+            <Badge variant={config?.is_connected ? "default" : "secondary"}
+              className={config?.is_connected ? "bg-success text-success-foreground" : ""}>
+              {config?.is_connected ? "Connected" : "Not Connected"}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -77,56 +94,105 @@ export default function N8nAdmin() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">n8n Base URL</label>
-              <Input placeholder="https://n8n.example.com" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} />
+              <Input placeholder="https://n8n.example.com" value={baseUrl} onChange={e => setBaseUrl(e.target.value)} />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">API Key</label>
-              <Input type="password" placeholder="n8n-api-key" value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
+              <Input type="password" placeholder="n8n-api-key" value={apiKey} onChange={e => setApiKey(e.target.value)} />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Webhook Secret (optional)</label>
-              <Input type="password" placeholder="webhook-secret" value={webhookSecret} onChange={(e) => setWebhookSecret(e.target.value)} />
+              <Input type="password" placeholder="webhook-secret" value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} />
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleTestConnection} size="sm">
-              <RefreshCw className="w-3 h-3 mr-1" /> Test Connection
+          <div className="flex gap-2 flex-wrap">
+            <Button onClick={handleSaveConfig} size="sm" disabled={saveConfig.isPending}>
+              <Save className="w-3 h-3 mr-1" />
+              {saveConfig.isPending ? "Duke ruajtur..." : "Ruaj"}
             </Button>
-            <Button variant="outline" size="sm">
-              <RefreshCw className="w-3 h-3 mr-1" /> Sync Workflows
+            <Button onClick={() => testConnection.mutate()} size="sm" variant="outline" disabled={testConnection.isPending || !config}>
+              <RefreshCw className={`w-3 h-3 mr-1 ${testConnection.isPending ? "animate-spin" : ""}`} />
+              Test Connection
+            </Button>
+            <Button onClick={() => syncWorkflows.mutate()} size="sm" variant="outline"
+              disabled={syncWorkflows.isPending || !config?.is_connected}>
+              <RefreshCw className={`w-3 h-3 mr-1 ${syncWorkflows.isPending ? "animate-spin" : ""}`} />
+              Sync Workflows
             </Button>
           </div>
+          {config?.last_sync && (
+            <p className="text-[10px] text-muted-foreground">
+              Last sync: {new Date(config.last_sync).toLocaleString()}
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      {/* Workflow Mappings */}
+      {/* Workflows */}
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="text-base">Workflows ({workflows.length})</CardTitle>
+          <CardTitle className="text-base">
+            Workflows ({workflows?.length || 0})
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {workflows.map((wf) => (
-              <div key={wf.id} className="flex items-center justify-between p-3 rounded-md bg-muted/30 border border-border/50">
-                <div className="flex items-center gap-3">
-                  {statusIcons[wf.status]}
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{wf.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Badge variant="outline" className="text-[10px]">{wf.eventType}</Badge>
-                      {wf.lastRun && <span className="text-[10px] text-muted-foreground">{wf.lastRun}</span>}
+          {wfLoading ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-md" />)}
+            </div>
+          ) : !workflows?.length ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              {config?.is_connected
+                ? 'Klikoni "Sync Workflows" për të importuar workflows nga n8n.'
+                : "Lidhuni me n8n për të parë workflows."}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {workflows.map(wf => (
+                <div key={wf.id} className="flex items-center justify-between p-3 rounded-md bg-muted/30 border border-border/50">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {statusIcons[wf.status] || statusIcons.idle}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{wf.name}</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <Select
+                          value={wf.event_type || ""}
+                          onValueChange={(val) => updateMapping.mutate({ workflow_id: wf.id, event_type: val })}
+                        >
+                          <SelectTrigger className="h-6 w-40 text-[10px]">
+                            <SelectValue placeholder="Event type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {EVENT_TYPES.map(et => (
+                              <SelectItem key={et} value={et} className="text-xs">{et}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {wf.last_run && (
+                          <span className="text-[10px] text-muted-foreground">
+                            Last: {new Date(wf.last_run).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost" size="sm" className="h-7 w-7 p-0"
+                      onClick={() => triggerWorkflow.mutate(wf.id)}
+                      disabled={triggerWorkflow.isPending}
+                    >
+                      <Play className="w-3 h-3" />
+                    </Button>
+                    <Switch
+                      checked={wf.active}
+                      onCheckedChange={(active) => toggleWorkflow.mutate({ workflow_id: wf.id, active })}
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                    <Play className="w-3 h-3" />
-                  </Button>
-                  <Switch checked={wf.active} onCheckedChange={() => toggleWorkflow(wf.id)} />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

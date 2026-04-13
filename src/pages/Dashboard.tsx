@@ -1,10 +1,27 @@
-import { integrations, categories, type IntegrationCategory } from "@/data/integrations";
+import { useIntegrations } from "@/hooks/use-integrations";
 import IntegrationCard from "@/components/IntegrationCard";
 import { Badge } from "@/components/ui/badge";
+import { categories, type IntegrationCategory } from "@/data/integrations";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
-  const connected = integrations.filter((i) => i.status === "connected").length;
-  const total = integrations.length;
+  const { data: integrations, isLoading } = useIntegrations();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 max-w-6xl">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24 rounded-lg" />)}
+        </div>
+      </div>
+    );
+  }
+
+  const items = integrations || [];
+  const connected = items.filter(i => i.status === "connected").length;
+  const total = items.length;
+  const oauthCount = items.filter(i => i.supports_oauth).length;
 
   return (
     <div className="space-y-8 max-w-6xl">
@@ -19,22 +36,23 @@ export default function Dashboard() {
         <StatCard label="Total Integrime" value={total} />
         <StatCard label="Të lidhura" value={connected} variant="success" />
         <StatCard label="Të pa-lidhura" value={total - connected} />
-        <StatCard label="Me OAuth" value={integrations.filter((i) => i.supportsOAuth).length} variant="info" />
+        <StatCard label="Me OAuth" value={oauthCount} variant="info" />
       </div>
 
       {(Object.entries(categories) as [IntegrationCategory, typeof categories[IntegrationCategory]][]).map(
         ([key, cat]) => {
-          const items = integrations.filter((i) => i.category === key);
+          const categoryItems = items.filter(i => i.category === key);
+          if (categoryItems.length === 0) return null;
           return (
             <section key={key}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xl">{cat.emoji}</span>
                 <h2 className="text-lg font-semibold text-foreground">{cat.label}</h2>
-                <Badge variant="secondary" className="text-xs">{items.length}</Badge>
+                <Badge variant="secondary" className="text-xs">{categoryItems.length}</Badge>
               </div>
               <p className="text-xs text-muted-foreground mb-4">{cat.description}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {items.map((integration) => (
+                {categoryItems.map((integration) => (
                   <IntegrationCard key={integration.id} integration={integration} />
                 ))}
               </div>
