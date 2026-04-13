@@ -10,6 +10,7 @@ const navItems: { to: string; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function AppSidebar() {
+  const location = useLocation();
   const { user, signOut } = useAuth();
 
   return (
