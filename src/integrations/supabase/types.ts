@@ -14,7 +14,241 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      integrations: {
+        Row: {
+          api_key_encrypted: string | null
+          category: Database["public"]["Enums"]["integration_category"]
+          config: Json | null
+          created_at: string
+          description: string | null
+          fields: string[] | null
+          icon: string | null
+          id: string
+          name: string
+          provider_id: string
+          status: Database["public"]["Enums"]["integration_status"]
+          supports_oauth: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          category: Database["public"]["Enums"]["integration_category"]
+          config?: Json | null
+          created_at?: string
+          description?: string | null
+          fields?: string[] | null
+          icon?: string | null
+          id?: string
+          name: string
+          provider_id: string
+          status?: Database["public"]["Enums"]["integration_status"]
+          supports_oauth?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          category?: Database["public"]["Enums"]["integration_category"]
+          config?: Json | null
+          created_at?: string
+          description?: string | null
+          fields?: string[] | null
+          icon?: string | null
+          id?: string
+          name?: string
+          provider_id?: string
+          status?: Database["public"]["Enums"]["integration_status"]
+          supports_oauth?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      n8n_config: {
+        Row: {
+          api_key_encrypted: string | null
+          base_url: string
+          created_at: string
+          id: string
+          is_connected: boolean
+          last_sync: string | null
+          updated_at: string
+          user_id: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          base_url: string
+          created_at?: string
+          id?: string
+          is_connected?: boolean
+          last_sync?: string | null
+          updated_at?: string
+          user_id: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          base_url?: string
+          created_at?: string
+          id?: string
+          is_connected?: boolean
+          last_sync?: string | null
+          updated_at?: string
+          user_id?: string
+          webhook_secret?: string | null
+        }
+        Relationships: []
+      }
+      n8n_workflows: {
+        Row: {
+          active: boolean
+          business_id: string | null
+          channel_id: string | null
+          created_at: string
+          event_type: string | null
+          id: string
+          last_run: string | null
+          logs: Json | null
+          n8n_workflow_id: string
+          name: string
+          provider: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          business_id?: string | null
+          channel_id?: string | null
+          created_at?: string
+          event_type?: string | null
+          id?: string
+          last_run?: string | null
+          logs?: Json | null
+          n8n_workflow_id: string
+          name: string
+          provider?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          business_id?: string | null
+          channel_id?: string | null
+          created_at?: string
+          event_type?: string | null
+          id?: string
+          last_run?: string | null
+          logs?: Json | null
+          n8n_workflow_id?: string
+          name?: string
+          provider?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      oauth_connections: {
+        Row: {
+          access_token: string | null
+          account_info: Json | null
+          account_label: string | null
+          created_at: string
+          id: string
+          integration_id: string
+          provider: string
+          refresh_token: string | null
+          scopes: string[] | null
+          token_expiry: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          account_info?: Json | null
+          account_label?: string | null
+          created_at?: string
+          id?: string
+          integration_id: string
+          provider: string
+          refresh_token?: string | null
+          scopes?: string[] | null
+          token_expiry?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          account_info?: Json | null
+          account_label?: string | null
+          created_at?: string
+          id?: string
+          integration_id?: string
+          provider?: string
+          refresh_token?: string | null
+          scopes?: string[] | null
+          token_expiry?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_connections_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json | null
+          processed_at: string | null
+          source: string | null
+          status: string
+          user_id: string
+          workflow_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          source?: string | null
+          status?: string
+          user_id: string
+          workflow_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          source?: string | null
+          status?: string
+          user_id?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "n8n_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +257,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      integration_category:
+        | "ai"
+        | "build"
+        | "automation"
+        | "delivery"
+        | "monitoring"
+        | "growth"
+      integration_status: "connected" | "disconnected" | "error"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +391,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      integration_category: [
+        "ai",
+        "build",
+        "automation",
+        "delivery",
+        "monitoring",
+        "growth",
+      ],
+      integration_status: ["connected", "disconnected", "error"],
+    },
   },
 } as const
