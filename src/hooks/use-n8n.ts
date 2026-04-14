@@ -36,15 +36,33 @@ export function useSaveN8nConfig() {
 
   return useMutation({
     mutationFn: async (config: { base_url: string; api_key: string; webhook_secret?: string }) => {
+      // Save config without plaintext keys first
       const { data, error } = await supabase.functions.invoke("n8n-proxy?action=save-config", {
-        body: config,
+        body: { base_url: config.base_url, api_key: "__encrypted__", webhook_secret: config.webhook_secret },
       });
       if (error) throw error;
+
+      // Encrypt the API key via encrypt-secret function
+      if (config.api_key && data?.config?.id) {
+        const { error: encError } = await supabase.functions.invoke("encrypt-secret?action=encrypt-and-save", {
+          body: { table: "n8n_config", id: data.config.id, field: "api_key_encrypted", value: config.api_key },
+        });
+        if (encError) throw encError;
+      }
+
+      // Encrypt webhook secret if provided
+      if (config.webhook_secret && data?.config?.id) {
+        const { error: encError } = await supabase.functions.invoke("encrypt-secret?action=encrypt-and-save", {
+          body: { table: "n8n_config", id: data.config.id, field: "webhook_secret", value: config.webhook_secret },
+        });
+        if (encError) throw encError;
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["n8n-config"] });
-      toast({ title: "Ruajtur", description: "Konfigurimi n8n u ruajt." });
+      toast({ title: "Ruajtur", description: "Konfigurimi n8n u ruajt me enkriptim." });
     },
     onError: (e) => toast({ title: "Error", description: String(e), variant: "destructive" }),
   });
