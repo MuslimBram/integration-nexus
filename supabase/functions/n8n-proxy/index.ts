@@ -140,9 +140,10 @@ serve(async (req) => {
         if (!wf) return jsonResponse({ success: false, error: "Workflow not found" }, 404);
 
         const endpoint = active ? "activate" : "deactivate";
+        const apiKey = await decryptField(config.api_key_encrypted);
         await fetch(`${config.base_url}/api/v1/workflows/${wf.n8n_workflow_id}/${endpoint}`, {
           method: "POST",
-          headers: { "X-N8N-API-KEY": config.api_key_encrypted! },
+          headers: { "X-N8N-API-KEY": apiKey! },
         });
 
         await supabaseClient
