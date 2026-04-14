@@ -71,10 +71,10 @@ export function useSaveApiKey() {
 
   return useMutation({
     mutationFn: async ({ id, apiKey, config }: { id: string; apiKey: string; config?: Record<string, string> }) => {
+      // First update config and status
       const { data, error } = await supabase
         .from("integrations")
         .update({
-          api_key_encrypted: apiKey,
           config: config || {},
           status: "connected",
         })
@@ -82,11 +82,20 @@ export function useSaveApiKey() {
         .select()
         .single();
       if (error) throw error;
+
+      // Then encrypt and save the API key via edge function
+      if (apiKey) {
+        const { error: encError } = await supabase.functions.invoke("encrypt-secret?action=encrypt-and-save", {
+          body: { table: "integrations", id, field: "api_key_encrypted", value: apiKey },
+        });
+        if (encError) throw encError;
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["integrations"] });
-      toast({ title: "Sukses", description: "API key u ruajt dhe integrimi u lidh." });
+      toast({ title: "Sukses", description: "API key u enkriptua dhe integrimi u lidh." });
     },
     onError: (error) => {
       toast({ title: "Error", description: String(error), variant: "destructive" });

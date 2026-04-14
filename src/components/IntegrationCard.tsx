@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { DbIntegration } from "@/hooks/use-integrations";
 import { useSaveApiKey, useDisconnectIntegration, useOAuthConnect } from "@/hooks/use-integrations";
+import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -20,6 +21,8 @@ interface Props {
 }
 
 export default function IntegrationCard({ integration }: Props) {
+  const { role } = useAuth();
+  const canManage = role && ["super_admin", "admin", "business_owner", "manager"].includes(role);
   const status = statusConfig[integration.status];
   const [showConfig, setShowConfig] = useState(false);
   const [apiKey, setApiKey] = useState("");
@@ -77,32 +80,36 @@ export default function IntegrationCard({ integration }: Props) {
         </CardHeader>
         <CardContent>
           <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{integration.description}</p>
-          <div className="flex gap-2">
-            {integration.status === "disconnected" ? (
-              <Button size="sm" className="w-full text-xs" onClick={handleConnect}>
-                {isOAuthProvider ? "Connect with OAuth" : "Configure"}
-              </Button>
-            ) : integration.status === "connected" ? (
-              <>
-                <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => setShowConfig(true)}>
-                  Manage
+          {canManage ? (
+            <div className="flex gap-2">
+              {integration.status === "disconnected" ? (
+                <Button size="sm" className="w-full text-xs" onClick={handleConnect}>
+                  {isOAuthProvider ? "Connect with OAuth" : "Configure"}
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs text-destructive hover:text-destructive"
-                  onClick={handleDisconnect}
-                  disabled={disconnect.isPending}
-                >
-                  Disconnect
+              ) : integration.status === "connected" ? (
+                <>
+                  <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => setShowConfig(true)}>
+                    Manage
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs text-destructive hover:text-destructive"
+                    onClick={handleDisconnect}
+                    disabled={disconnect.isPending}
+                  >
+                    Disconnect
+                  </Button>
+                </>
+              ) : (
+                <Button size="sm" variant="destructive" className="w-full text-xs" onClick={handleConnect}>
+                  Reconnect
                 </Button>
-              </>
-            ) : (
-              <Button size="sm" variant="destructive" className="w-full text-xs" onClick={handleConnect}>
-                Reconnect
-              </Button>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-[10px] text-muted-foreground italic">Vetëm shikimi — kontaktoni admin-in</p>
+          )}
         </CardContent>
       </Card>
 

@@ -66,12 +66,23 @@ serve(async (req) => {
 
       if (n8nConfig?.is_connected && n8nConfig.api_key_encrypted) {
         try {
+          // Decrypt API key
+          const ENCRYPTION_KEY = Deno.env.get("ENCRYPTION_KEY") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          let apiKey = n8nConfig.api_key_encrypted;
+          try {
+            const { data: decrypted } = await adminClient.rpc("decrypt_secret", {
+              encrypted_text: n8nConfig.api_key_encrypted,
+              encryption_key: ENCRYPTION_KEY,
+            });
+            if (decrypted) apiKey = decrypted;
+          } catch { /* fallback to raw value */ }
+
           const res = await fetch(
             `${n8nConfig.base_url}/api/v1/workflows/${workflow.n8n_workflow_id}/run`,
             {
               method: "POST",
               headers: {
-                "X-N8N-API-KEY": n8nConfig.api_key_encrypted,
+                "X-N8N-API-KEY": apiKey,
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ data: payload }),
