@@ -169,10 +169,11 @@ serve(async (req) => {
 
         if (!wf) return jsonResponse({ success: false, error: "Workflow not found" }, 404);
 
+        const apiKey = await decryptField(config.api_key_encrypted);
         const res = await fetch(`${config.base_url}/api/v1/workflows/${wf.n8n_workflow_id}/run`, {
           method: "POST",
           headers: {
-            "X-N8N-API-KEY": config.api_key_encrypted!,
+            "X-N8N-API-KEY": apiKey!,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({}),
