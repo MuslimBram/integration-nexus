@@ -30,12 +30,32 @@ serve(async (req) => {
     const action = url.searchParams.get("action");
     const body = req.method === "POST" ? await req.json() : null;
 
+    const adminClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const ENCRYPTION_KEY = Deno.env.get("ENCRYPTION_KEY") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
     // Get n8n config
     const { data: config } = await supabaseClient
       .from("n8n_config")
       .select("*")
       .eq("user_id", user.id)
       .single();
+
+    // Helper: decrypt a field
+    const decryptField = async (encryptedValue: string | null): Promise<string | null> => {
+      if (!encryptedValue) return null;
+      try {
+        const { data } = await adminClient.rpc("decrypt_secret", {
+          encrypted_text: encryptedValue,
+          encryption_key: ENCRYPTION_KEY,
+        });
+        return data || encryptedValue; // fallback to raw value if decryption fails (legacy data)
+      } catch {
+        return encryptedValue; // fallback for non-encrypted legacy values
+      }
+    };
 
     switch (action) {
       case "save-config": {
@@ -60,8 +80,9 @@ serve(async (req) => {
           return jsonResponse({ success: false, error: "No n8n config found" }, 400);
         }
         try {
+          const apiKey = await decryptField(config.api_key_encrypted);
           const res = await fetch(`${config.base_url}/api/v1/workflows`, {
-            headers: { "X-N8N-API-KEY": config.api_key_encrypted! },
+            headers: { "X-N8N-API-KEY": apiKey! },
           });
           const connected = res.ok;
           await supabaseClient
@@ -78,8 +99,9 @@ serve(async (req) => {
         if (!config?.is_connected) {
           return jsonResponse({ success: false, error: "Not connected to n8n" }, 400);
         }
+        const apiKey = await decryptField(config.api_key_encrypted);
         const res = await fetch(`${config.base_url}/api/v1/workflows`, {
-          headers: { "X-N8N-API-KEY": config.api_key_encrypted! },
+          headers: { "X-N8N-API-KEY": apiKey! },
         });
         if (!res.ok) throw new Error(`n8n API error: ${res.status}`);
         const { data: workflows } = await res.json();
