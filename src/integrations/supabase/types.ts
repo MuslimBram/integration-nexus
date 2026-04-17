@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      channel_settings: {
+        Row: {
+          ai_auto_reply: boolean
+          channel: string
+          config: Json | null
+          created_at: string
+          enabled: boolean
+          id: string
+          system_prompt: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_auto_reply?: boolean
+          channel: string
+          config?: Json | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          system_prompt?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_auto_reply?: boolean
+          channel?: string
+          config?: Json | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          system_prompt?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          channel: string
+          contact_handle: string | null
+          contact_name: string | null
+          created_at: string
+          external_id: string
+          id: string
+          last_message_at: string | null
+          unread_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          contact_handle?: string | null
+          contact_name?: string | null
+          created_at?: string
+          external_id: string
+          id?: string
+          last_message_at?: string | null
+          unread_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          contact_handle?: string | null
+          contact_name?: string | null
+          created_at?: string
+          external_id?: string
+          id?: string
+          last_message_at?: string | null
+          unread_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       integrations: {
         Row: {
           api_key_encrypted: string | null
@@ -64,6 +139,109 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      leads: {
+        Row: {
+          channel: string | null
+          contact_handle: string | null
+          contact_name: string | null
+          conversation_id: string | null
+          created_at: string
+          id: string
+          message: string | null
+          payload: Json | null
+          source: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channel?: string | null
+          contact_handle?: string | null
+          contact_name?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          source: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string | null
+          contact_handle?: string | null
+          contact_name?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          channel: string
+          content: string
+          conversation_id: string
+          created_at: string
+          direction: string
+          external_message_id: string | null
+          id: string
+          metadata: Json | null
+          sender: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          content: string
+          conversation_id: string
+          created_at?: string
+          direction: string
+          external_message_id?: string | null
+          id?: string
+          metadata?: Json | null
+          sender?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          external_message_id?: string | null
+          id?: string
+          metadata?: Json | null
+          sender?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       n8n_config: {
         Row: {
@@ -204,6 +382,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      telegram_bot_owner: {
+        Row: {
+          id: number
+          owner_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          id: number
+          owner_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          owner_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      telegram_bot_state: {
+        Row: {
+          id: number
+          update_offset: number
+          updated_at: string
+        }
+        Insert: {
+          id: number
+          update_offset?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          update_offset?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
