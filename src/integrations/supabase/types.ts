@@ -419,6 +419,57 @@ export type Database = {
         }
         Relationships: []
       }
+      twilio_config: {
+        Row: {
+          created_at: string
+          id: string
+          sms_from_number: string | null
+          updated_at: string
+          user_id: string
+          webhook_secret: string | null
+          whatsapp_from_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sms_from_number?: string | null
+          updated_at?: string
+          user_id: string
+          webhook_secret?: string | null
+          whatsapp_from_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sms_from_number?: string | null
+          updated_at?: string
+          user_id?: string
+          webhook_secret?: string | null
+          whatsapp_from_number?: string | null
+        }
+        Relationships: []
+      }
+      twilio_number_routing: {
+        Row: {
+          channel: string
+          created_at: string
+          phone_number: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          phone_number: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          phone_number?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_by: string | null

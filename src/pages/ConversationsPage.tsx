@@ -12,8 +12,10 @@ import {
   useClaimTelegramBot, useTelegramOwner,
   useChannelSettings, useUpdateChannelSettings,
 } from "@/hooks/use-messaging";
+import { useSendTwilioMessage } from "@/hooks/use-twilio";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import TwilioSettingsCard from "@/components/TwilioSettingsCard";
 
 const channelIcon: Record<string, JSX.Element> = {
   telegram: <Send className="w-3 h-3" />,
@@ -29,6 +31,7 @@ export default function ConversationsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { data: messages } = useMessages(selectedId);
   const send = useSendTelegramMessage();
+  const sendTwilio = useSendTwilioMessage();
   const [draft, setDraft] = useState("");
 
   const { data: settings } = useChannelSettings("telegram");
@@ -38,10 +41,16 @@ export default function ConversationsPage() {
   const selected = conversations?.find(c => c.id === selectedId);
 
   const handleSend = () => {
-    if (!selectedId || !draft.trim()) return;
-    send.mutate({ conversation_id: selectedId, text: draft }, {
-      onSuccess: () => setDraft(""),
-    });
+    if (!selectedId || !draft.trim() || !selected) return;
+    const onSuccess = () => setDraft("");
+    if (selected.channel === "telegram") {
+      send.mutate({ conversation_id: selectedId, text: draft }, { onSuccess });
+    } else if (selected.channel === "sms" || selected.channel === "whatsapp") {
+      sendTwilio.mutate(
+        { conversation_id: selectedId, text: draft, channel: selected.channel as "sms" | "whatsapp" },
+        { onSuccess },
+      );
+    }
   };
 
   return (
@@ -98,6 +107,8 @@ export default function ConversationsPage() {
           </CardContent>
         </Card>
       )}
+
+      <TwilioSettingsCard />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-22rem)] min-h-[400px]">
         {/* Conversations list */}
