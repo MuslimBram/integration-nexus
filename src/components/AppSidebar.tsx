@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { categories, type IntegrationCategory } from "@/data/integrations";
-import { LayoutDashboard, Settings, Workflow, LogOut, Shield, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Settings, Workflow, LogOut, Shield, MessageSquare, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 const navItems: { to: string; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
   { to: "/", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
   { to: "/conversations", label: "Conversations", icon: <MessageSquare className="w-4 h-4" /> },
+  { to: "/leads", label: "Leads", icon: <Users className="w-4 h-4" /> },
   { to: "/n8n", label: "n8n Workflows", icon: <Workflow className="w-4 h-4" />, adminOnly: true },
 ];
 
