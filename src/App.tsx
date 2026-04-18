@@ -10,6 +10,7 @@ import CategoryPage from "./pages/CategoryPage";
 import N8nAdmin from "./pages/N8nAdmin";
 import ConversationsPage from "./pages/ConversationsPage";
 import LeadsPage from "./pages/LeadsPage";
+import LogsPage from "./pages/LogsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AuthPage from "./pages/AuthPage";
 import OAuthCallback from "./pages/OAuthCallback";
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="/category/:categoryId" element={<CategoryPage />} />
         <Route path="/conversations" element={<ConversationsPage />} />
         <Route path="/leads" element={<LeadsPage />} />
+        <Route path="/logs" element={<LogsPage />} />
         <Route path="/n8n" element={<N8nAdmin />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
