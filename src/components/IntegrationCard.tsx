@@ -32,12 +32,13 @@ export default function IntegrationCard({ integration }: Props) {
   const disconnect = useDisconnectIntegration();
   const oauthConnect = useOAuthConnect();
 
+  const providerId = (integration.provider_id ?? "").toLowerCase();
+  const providerName = (integration.name ?? "").toLowerCase();
   const isOAuthProvider = integration.supports_oauth &&
-    OAUTH_PROVIDERS.some(p => integration.provider_id.includes(p) ||
-      integration.name.toLowerCase().includes(p));
+    OAUTH_PROVIDERS.some(p => providerId.includes(p) || providerName.includes(p));
 
   const providerKey = OAUTH_PROVIDERS.find(p =>
-    integration.provider_id.includes(p) || integration.name.toLowerCase().includes(p)
+    providerId.includes(p) || providerName.includes(p)
   );
 
   const handleConnect = () => {
