@@ -108,6 +108,8 @@ export default function ConversationsPage() {
         </Card>
       )}
 
+      <TwilioSettingsCard />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-22rem)] min-h-[400px]">
         {/* Conversations list */}
         <Card className="glass-card md:col-span-1 flex flex-col overflow-hidden">
