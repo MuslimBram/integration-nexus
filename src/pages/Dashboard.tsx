@@ -3,6 +3,7 @@ import IntegrationCard from "@/components/IntegrationCard";
 import { Badge } from "@/components/ui/badge";
 import { categories, type IntegrationCategory } from "@/data/integrations";
 import { Skeleton } from "@/components/ui/skeleton";
+import SEO from "@/components/SEO";
 
 export default function Dashboard() {
   const { data: integrations, isLoading } = useIntegrations();
@@ -25,8 +26,13 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 max-w-6xl">
+      <SEO
+        title="Integrations Hub Dashboard — Përmbledhje e integrimeve"
+        description="Përmbledhje e të gjitha integrimeve aktive: numri i lidhjeve, OAuth, dhe kanalet e komunikimit në Integrations Hub."
+        path="/"
+      />
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-foreground">Integrations Hub Dashboard</h1>
         <p className="text-muted-foreground text-sm mt-1">
           {connected}/{total} integrime aktive
         </p>

@@ -28,7 +28,7 @@ export default function AppSidebar() {
   return (
     <aside className="w-64 min-h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
       <div className="p-5 border-b border-sidebar-border">
-        <h1 className="text-lg font-bold text-sidebar-primary-foreground tracking-tight">⚡ Integrations Hub</h1>
+        <div className="text-lg font-bold text-sidebar-primary-foreground tracking-tight">⚡ Integrations Hub</div>
         <p className="text-xs text-sidebar-foreground/60 mt-1">Menaxho të gjitha integrimet</p>
       </div>
 

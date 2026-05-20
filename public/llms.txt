@@ -1,0 +1,7 @@
+# Integrations Hub
+
+> Menaxho integrimet (Telegram, WhatsApp, SMS, n8n) në një vend, me AI auto-reply dhe ndjekje lead-esh.
+
+## Pages
+
+- [Home](/): Hyrje në Integrations Hub.

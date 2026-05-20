@@ -53,9 +53,11 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md glass-card">
+      <main className="w-full max-w-md">
+      <Card className="w-full glass-card">
         <CardHeader className="text-center">
-          <div className="text-4xl mb-2">⚡</div>
+          <div className="text-4xl mb-2" aria-hidden="true">⚡</div>
+          <h1 className="sr-only">Identifikohu në Integrations Hub</h1>
           <CardTitle className="text-2xl">Integrations Hub</CardTitle>
           <CardDescription>
             {isLogin ? "Identifikohuni për të vazhduar" : "Krijoni një llogari të re"}
@@ -108,6 +110,7 @@ export default function AuthPage() {
           </div>
         </CardContent>
       </Card>
+      </main>
     </div>
   );
 }

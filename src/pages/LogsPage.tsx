@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useWebhookEvents } from "@/hooks/use-webhook-events";
 import { Activity, Search, Eye } from "lucide-react";
+import SEO from "@/components/SEO";
 import { cn } from "@/lib/utils";
 
 const STATUSES = ["pending", "processed", "error"] as const;
@@ -59,6 +60,11 @@ export default function LogsPage() {
 
   return (
     <div className="space-y-4 max-w-7xl">
+      <SEO
+        title="Logs & Webhook Events — Debugging në kohë reale | Integrations Hub"
+        description="Monitoro eventet hyrëse nga të gjitha kanalet në kohë reale për debugging end-to-end të webhooks."
+        path="/logs"
+      />
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Activity className="w-6 h-6 text-primary" />
