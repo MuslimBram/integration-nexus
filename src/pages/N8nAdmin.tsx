@@ -181,8 +181,9 @@ export default function N8nAdmin() {
                       variant="ghost" size="sm" className="h-7 w-7 p-0"
                       onClick={() => triggerWorkflow.mutate(wf.id)}
                       disabled={triggerWorkflow.isPending}
+                      aria-label={`Aktivizo workflow-in ${wf.name}`}
                     >
-                      <Play className="w-3 h-3" />
+                      <Play className="w-3 h-3" aria-hidden="true" />
                     </Button>
                     <Switch
                       checked={wf.active}
