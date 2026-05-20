@@ -1,10 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import SEO from "@/components/SEO";
 
 export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
-      <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+      <SEO
+        title="Hub Settings — Konfigurime të Integrations Hub"
+        description="Konfiguro instalimin PWA dhe preferencat e Integrations Hub në çdo pajisje: PC, tablet ose telefon."
+        path="/settings"
+      />
+      <h1 className="text-2xl font-bold text-foreground">Hub Settings</h1>
 
       <Card className="glass-card">
         <CardHeader>
