@@ -6,7 +6,7 @@ export default function AppLayout() {
   return (
     <div className="flex min-h-screen">
       <AppSidebar />
-      <main className="flex-1 p-6 overflow-auto">
+      <main id="main-content" className="flex-1 p-6 overflow-auto">
         <Outlet />
       </main>
       <InstallPrompt />
