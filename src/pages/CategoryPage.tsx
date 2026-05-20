@@ -3,6 +3,7 @@ import { categories, type IntegrationCategory } from "@/data/integrations";
 import { useIntegrations } from "@/hooks/use-integrations";
 import IntegrationCard from "@/components/IntegrationCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import SEO from "@/components/SEO";
 
 export default function CategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -26,6 +27,11 @@ export default function CategoryPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      <SEO
+        title={`${cat.label} — Integrime | Integrations Hub`}
+        description={cat.description}
+        path={`/category/${categoryId}`}
+      />
       <div>
         <h1 className="text-2xl font-bold text-foreground">
           {cat.emoji} {cat.label}

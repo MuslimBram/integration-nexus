@@ -17,6 +17,7 @@ import {
   useTriggerN8nWorkflow,
   useUpdateWorkflowMapping,
 } from "@/hooks/use-n8n";
+import SEO from "@/components/SEO";
 
 const EVENT_TYPES = [
   "new_lead", "new_message", "missed_call", "form_submit",
@@ -69,6 +70,11 @@ export default function N8nAdmin() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      <SEO
+        title="n8n Automation Admin — Menaxho workflows | Integrations Hub"
+        description="Konfiguro lidhjen me n8n, sinkronizo workflows dhe mapo event-et për automatizimin e të gjitha integrimeve."
+        path="/n8n"
+      />
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Workflow className="w-6 h-6 text-primary" />

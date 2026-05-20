@@ -17,6 +17,7 @@ import { useSendTwilioMessage } from "@/hooks/use-twilio";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import TwilioSettingsCard from "@/components/TwilioSettingsCard";
+import SEO from "@/components/SEO";
 
 const channelIcon: Record<string, JSX.Element> = {
   telegram: <Send className="w-3 h-3" />,
@@ -63,6 +64,11 @@ export default function ConversationsPage() {
 
   return (
     <div className="space-y-4 max-w-7xl">
+      <SEO
+        title="Conversations — Bisedat shumë-kanalëshe | Integrations Hub"
+        description="Menaxho bisedat nga Telegram, WhatsApp dhe SMS në një vend, me përgjigje automatike AI dhe dërgim direkt."
+        path="/conversations"
+      />
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { useLeads, useUpdateLeadStatus } from "@/hooks/use-leads";
 import { Users, Send, Phone, MessageSquare, ExternalLink, Search } from "lucide-react";
+import SEO from "@/components/SEO";
 import { cn } from "@/lib/utils";
 
 const channelIcon: Record<string, JSX.Element> = {
@@ -67,6 +68,11 @@ export default function LeadsPage() {
 
   return (
     <div className="space-y-4 max-w-7xl">
+      <SEO
+        title="Leads — Ndjekje lead-esh shumë-kanalëshe | Integrations Hub"
+        description="Lead-et e mbledhura nga Telegram, WhatsApp dhe SMS me filtra, kërkim dhe status updates në kohë reale."
+        path="/leads"
+      />
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Users className="w-6 h-6 text-primary" />
